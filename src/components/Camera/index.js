@@ -87,10 +87,10 @@ export default function Camera() {
           base64: true,
         };
 
-        // Get the base64 version of the image
-        camera.pausePreview();
         const data = await camera.takePictureAsync(options);
 
+        // Get the base64 version of the image
+        camera.pausePreview();
         // Call the identify function
         identifyImage(data.base64);
       }
