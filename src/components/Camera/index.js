@@ -1,5 +1,7 @@
-import React, {useState, useRef, useEffect} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useState} from 'react';
 import {Dimensions, Alert, StyleSheet, ActivityIndicator} from 'react-native';
+// import {promisify} from 'util';
 
 import {RNCamera} from 'react-native-camera';
 
@@ -30,18 +32,19 @@ export default function Camera() {
   // const camera = useRef(null);
 
   const [loading, setLoading] = useState(false);
-
-  /**
-   * useEffect(() => {
-    if (loading && camera) {
-      camera.pausePreview();
-    } else {
-      camera.resumePreview();
+  /*
+  useEffect(() => {
+    if (camera !== null) {
+      if (loading) {
+        camera.pausePreview();
+      } else {
+        camera.resumePreview();
+      }
     }
-  }, [camera, loading]);
-   */
+  }, [loading]);
+ */
 
-  function displayAnswer(identifiedImage) {
+  async function displayAnswer(identifiedImage) {
     // Dismiss the acitivty indicator
     setIdentifedAs(identifiedImage);
     setLoading(false);
@@ -50,9 +53,7 @@ export default function Camera() {
     Alert.alert(identifedAs);
 
     // Resume the preview
-    // camera.resumePreview();
-
-    //
+    camera.resumePreview();
   }
 
   function identifyImage(imageData) {
@@ -74,24 +75,27 @@ export default function Camera() {
   }
 
   async function takePicture() {
-    if (camera) {
-      // Pause the camera preview
+    try {
+      if (camera) {
+        // Pause the camera preview
 
-      // camera.pausePreview();
+        // Update the state to indicate loading
+        setLoading(true);
 
-      // Update the state to indicate loading
-      setLoading(true);
+        // Set the options for the camera
+        const options = {
+          base64: true,
+        };
 
-      // Set the options for the camera
-      const options = {
-        base64: true,
-      };
+        // Get the base64 version of the image
+        camera.pausePreview();
+        const data = await camera.takePictureAsync(options);
 
-      // Get the base64 version of the image
-      const data = await camera.takePictureAsync(options);
-
-      // Call the identify function
-      identifyImage(data.base64);
+        // Call the identify function
+        identifyImage(data.base64);
+      }
+    } catch (error) {
+      Alert.alert('Something whent wrong! =(');
     }
   }
 
